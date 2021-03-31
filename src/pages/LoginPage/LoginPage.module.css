@@ -1,0 +1,9 @@
+.body {
+  margin:0;
+  height:100vh;
+  background:radial-gradient(100% 200% at left,transparent 49.9%,rgba(255, 255, 255, 0.872) 50.1%);
+}
+
+.main {
+  background-image: url(./bg.jpg);
+}
