@@ -15,7 +15,6 @@ const trySignUp = async (username, password) => {
     username: username,
     password: password,
   };
-  console.log(requestBody);
 
   const response = await axios.post("/api/membership/login", requestBody);
   checkSignUpResponse(response.data);

@@ -1,13 +1,12 @@
 import { useState, useContext, useEffect } from "react";
 import { useGetPendingPackages } from "../../features/tracking/hooks/useGetPendingPackages";
-import styles from "./ProfilePage.module.css";
 import { AuthContext } from "../../features/authentication/context/AuthContext";
 import { NOT_FOUND_ERROR, UNEXPECTED_ERROR } from "../../helpers/errorHandler";
 import { PendingCard } from "../../components/molecules/PendingCard/PendingCard";
-import { Spinner, Navbar, Button } from "react-bootstrap";
+import { Spinner } from "react-bootstrap";
 import { loginRoute } from "../routes";
 import { useHistory } from "react-router";
-import { useAuthenticatedRoute } from "../../features/authentication/hooks/useAuthenticatedRoute";
+import { Header } from "../../components/molecules/Header/Header";
 
 export const ProfilePage = () => {
   const { currentUser, loading: loadingUser, logout } = useContext(AuthContext);
@@ -41,19 +40,7 @@ export const ProfilePage = () => {
     history.push(loginRoute);
   };
 
-  const Header = () => (
-    <Navbar className={`${styles.header}`}>
-      <Navbar.Brand>{currentUser?.fullName} </Navbar.Brand>
-
-      <div className="d-flex w-100 justify-content-end p-4">
-        <Button variant="danger" onClick={handleClickLogOut}>
-          LogOut
-        </Button>
-      </div>
-    </Navbar>
-  );
-
-  const LoadingSpinner = () => (
+  const LoadingSpinnerScreen = () => (
     <div
       className="d-flex justify-content-center align-items-center"
       style={{ minHeight: "100vh" }}
@@ -64,10 +51,13 @@ export const ProfilePage = () => {
 
   return (
     <>
-      <Header></Header>
+      <Header
+        userFullName={currentUser?.fullName}
+        onClick={handleClickLogOut}
+      />
       <main className="d-flex flex-wrap justify-content-around ">
         {loading ? (
-          <LoadingSpinner></LoadingSpinner>
+          <LoadingSpinnerScreen></LoadingSpinnerScreen>
         ) : (
           pendingPackages.map((pendingPackage) => (
             <div className="p-2" key={pendingPackage.description}>

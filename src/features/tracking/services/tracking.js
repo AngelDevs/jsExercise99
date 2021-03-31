@@ -18,7 +18,6 @@ class TrackingService {
 }
 
 const tryGetPendingPackages = async (username) => {
-  console.log(username);
   const response = await axios.get(
     `/api/packages/getPending?username=${username}`
   );

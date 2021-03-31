@@ -1,4 +1,4 @@
-import { Card, Button, ListGroup } from "react-bootstrap";
+import { Card, ListGroup } from "react-bootstrap";
 import image from "../../../pages/LoginPage/bg.jpg";
 export const PendingCard = ({
   title,

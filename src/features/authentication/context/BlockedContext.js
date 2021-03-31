@@ -1,7 +1,4 @@
-import React, { useState, useEffect, useContext, createContext } from "react";
-
-import User from "../entities/user";
-import { AuthContext } from "./AuthContext";
+import React, { useState, useEffect, createContext } from "react";
 
 export const BlockedContext = createContext();
 
@@ -11,7 +8,7 @@ export const BlockedProvider = ({ children }) => {
 
   useEffect(() => {
     const isBlocked = JSON.parse(sessionStorage.getItem("blocked"));
-    console.log(isBlocked);
+
     setBlocked(isBlocked);
   }, []);
 

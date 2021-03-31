@@ -5,8 +5,6 @@ import {
   UNAUTHORIZED_ERROR,
   UNEXPECTED_ERROR,
 } from "../../../helpers/errorHandler";
-import { useHistory } from "react-router";
-import { loginRoute } from "../../../pages/routes";
 
 export const AuthContext = createContext();
 
@@ -20,7 +18,7 @@ export const AuthProvider = ({ children }) => {
 
     if (userJson) {
       const user = User.fromJson(userJson);
-      console.log(user);
+
       setCurrentUser(user);
     }
   }, []);

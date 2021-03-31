@@ -1,25 +1,31 @@
 import { useState, useEffect, useContext } from "react";
-import { Form, Button, Alert, Spinner, Container } from "react-bootstrap";
 import { useHistory } from "react-router";
+import { Form, Button, Spinner, Alert } from "react-bootstrap";
+import { FormGroupInput } from "../../molecules/FormGroupInput/FormGroupInput";
 import { profileRoute } from "../../../pages/routes";
-
 import {
   UNAUTHORIZED_ERROR,
   UNEXPECTED_ERROR,
 } from "../../../helpers/errorHandler";
-
-import { useAuthSignUp } from "../../../features/authentication/hooks/useAuthSignUp";
 import { BlockedContext } from "../../../features/authentication/context/BlockedContext";
+import { useAuthSignUp } from "../../../features/authentication/hooks/useAuthSignUp";
+import {
+  checkForSpecialCharacters,
+  removeSpecialCharacters,
+} from "../../../helpers/inputValidator";
+
+import styles from "./LoginForm.module.css";
+
 export const LoginForm = () => {
   const history = useHistory();
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [usernameError, setUsernameError] = useState();
+  const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState();
-
-  const [loading, asyncSignUp] = useAuthSignUp();
+  const [loginError, setLoginError] = useState();
   const [count, setCounter] = useState(0);
   const { blocked, setBlocked } = useContext(BlockedContext);
+  const [loading, asyncSignUp] = useAuthSignUp();
 
   useEffect(() => {
     const alertTimeOut = setTimeout(() => {
@@ -39,9 +45,18 @@ export const LoginForm = () => {
     };
   }, [passwordError]);
 
+  useEffect(() => {
+    const alertTimeOut = setTimeout(() => {
+      setLoginError(null);
+    }, 2000);
+    return () => {
+      clearTimeout(alertTimeOut);
+    };
+  }, [loginError]);
+
   const onChangeUsername = (e) => {
     let { value } = e.currentTarget;
-    let hasSpecialCharacter = value.match(/[^a-zA-Z0-9]/g) != null;
+    let hasSpecialCharacter = checkForSpecialCharacters(value);
 
     if (hasSpecialCharacter) {
       setUsernameError(
@@ -55,14 +70,14 @@ export const LoginForm = () => {
       return;
     }
 
-    value = value.replace(/[^a-zA-Z0-9]/g, "");
+    value = removeSpecialCharacters(value);
     setUsername(value);
   };
 
   const onChangePassword = (e) => {
     let { value } = e.currentTarget;
 
-    let hasSpecialCharacter = value.match(/[^a-zA-Z0-9]/g) != null;
+    let hasSpecialCharacter = checkForSpecialCharacters(value);
 
     if (hasSpecialCharacter) {
       setPasswordError(
@@ -71,29 +86,33 @@ export const LoginForm = () => {
       return;
     }
 
+    value = removeSpecialCharacters(value);
     setPassword(e.currentTarget.value);
   };
 
   const handleClickSignUp = async () => {
     if (blocked) {
-      alert("blocked");
+      setLoginError(
+        "You tried to login too many times, your account has been blocked"
+      );
       return;
     }
 
     const data = await asyncSignUp(username, password);
-    console.log(data);
     if (data.error === UNEXPECTED_ERROR) {
-      console.log("asdf");
       return;
     }
 
     if (data.error === UNAUTHORIZED_ERROR) {
-      alert(`unauthorized, you have ${count} atttemps remaining`);
+      setLoginError(`unauthorized, you have ${2 - count} atttemps remaining`);
+      let internalCount;
       setCounter((prevCount) => {
-        return prevCount + 1;
+        const updatedCount = prevCount + 1;
+        internalCount = updatedCount;
+        return updatedCount;
       });
 
-      if (count) {
+      if (internalCount === 3) {
         setBlocked(true);
       }
 
@@ -105,38 +124,21 @@ export const LoginForm = () => {
 
   return (
     <Form noValidate>
-      <Form.Group controlId="formBasicEmail" style={{ width: "250px" }}>
-        <Form.Label>Username</Form.Label>
-
-        <Form.Control
-          type="text"
-          value={username}
-          onChange={onChangeUsername}
-          placeholder="Enter Username"
-        />
-        <br />
-        {usernameError ? (
-          <Alert key={""} variant={"danger"}>
-            {usernameError}
-          </Alert>
-        ) : null}
-      </Form.Group>
-
-      <Form.Group controlId="formBasicPassword">
-        <Form.Label>Password</Form.Label>
-        <Form.Control
-          type="password"
-          value={password}
-          onChange={onChangePassword}
-          placeholder="Password"
-        />
-        <br />
-        {passwordError ? (
-          <Alert key={""} variant={"danger"}>
-            {passwordError}
-          </Alert>
-        ) : null}
-      </Form.Group>
+      <FormGroupInput
+        label={"Username"}
+        value={username}
+        onChange={onChangeUsername}
+        placeholder={"Enter username"}
+        error={usernameError}
+      />
+      <FormGroupInput
+        label={"Password"}
+        value={password}
+        onChange={onChangePassword}
+        placeholder={"Enter password"}
+        error={passwordError}
+        type={"password"}
+      />
 
       <div style={{ display: "flex", justifyContent: "center" }}>
         {loading ? (
@@ -146,6 +148,10 @@ export const LoginForm = () => {
             Submit
           </Button>
         )}
+      </div>
+
+      <div className={`${styles.alertContainer} p-2`}>
+        {loginError ? <Alert variant={"warning"}>{loginError}</Alert> : null}
       </div>
     </Form>
   );

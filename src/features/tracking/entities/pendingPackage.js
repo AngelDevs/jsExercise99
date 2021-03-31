@@ -1,5 +1,3 @@
-import StatusHistory from "./statusHistory";
-
 export default class PendingPackage {
   constructor(
     description,

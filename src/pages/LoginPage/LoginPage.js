@@ -1,5 +1,5 @@
 import React from "react";
-import { LoginForm } from "../../components/molecules/FormControl/LoginForm";
+import { LoginForm } from "../../components/organisms/LoginForm/LoginForm";
 
 import "./bg.jpg";
 import styles from "./LoginPage.module.css";
